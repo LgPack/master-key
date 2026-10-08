@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Мастер-Ключ">
+  <title>Мастер-Ключ | Система Чарльза Хаанела</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Верхняя панель -->
+    <header class="app-header">
+      <div class="logo-area">
+        <span class="key-icon">🗝️</span>
+        <div>
+          <h1 class="app-title">МАСТЕР-КЛЮЧ</h1>
+          <p class="app-subtitle">Чарльз Ф. Хаанел</p>
+        </div>
+      </div>
+      <div class="streak-badge" id="streakBadge" title="Дней практики подряд">
+        <span class="fire-icon">🔥</span>
+        <span id="streakCount">0</span> дн.
+      </div>
+    </header>
+
+    <!-- Основной контент (переключение вкладок) -->
+    <main class="main-content">
+      <!-- 1. Экран карты 24 ступеней -->
+      <section id="tab-path" class="tab-pane active">
+        <div class="screen-header">
+          <h2>Ступени Познания</h2>
+          <p class="screen-desc">Строгая последовательность: следующий этап откроется только после закрепления текущего.</p>
+        </div>
+
+        <div class="current-focus-card" id="currentFocusCard">
+          <div class="focus-badge">ТЕКУЩАЯ СТУПЕНЬ</div>
+          <h3 id="currentWeekTitle">Неделя 1: Абсолютный физический контроль</h3>
+          <p id="currentWeekGoal">Удержание тела абсолютно неподвижным (15–20 мин). Подавление спонтанных импульсов.</p>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="currentWeekProgress" style="width: 14%;"></div>
+          </div>
+          <div class="focus-actions">
+            <button class="primary-btn" id="startCurrentPracticeBtn">Начать практику (15 мин)</button>
+          </div>
+        </div>
+
+        <div class="stages-accordion" id="stagesContainer">
+          <!-- Генерируется из data.js (6 этапов / 24 недели) -->
+        </div>
+      </section>
+
+      <!-- 2. Экран Таймера и Практики -->
+      <section id="tab-practice" class="tab-pane">
+        <div class="screen-header text-center">
+          <span class="stage-tag" id="practiceStageTag">Этап I • Неделя 1</span>
+          <h2 id="practiceWeekName">Физический контроль</h2>
+        </div>
+
+        <!-- Центральный визуальный таймер -->
+        <div class="meditation-circle-wrap">
+          <div class="pulse-ring"></div>
+          <div class="meditation-circle" id="timerCircle">
+            <div class="timer-display" id="timerDisplay">15:00</div>
+            <div class="timer-instruction" id="timerInstruction">Сядьте прямо. Неподвижность.</div>
+          </div>
+        </div>
+
+        <div class="duration-selector-wrap">
+          <span class="selector-label">Время сессии:</span>
+          <div class="duration-chips" id="durationChipsContainer">
+            <button class="duration-chip" data-mins="10">10 м</button>
+            <button class="duration-chip active" data-mins="15">15 м</button>
+            <button class="duration-chip" data-mins="20">20 м</button>
+            <button class="duration-chip" data-mins="30">30 м</button>
+            <button class="duration-chip" data-mins="45">45 м</button>
+            <button class="duration-chip" data-mins="60">1 ч</button>
+          </div>
+        </div>
+
+        <div class="timer-controls">
+          <button class="secondary-btn timer-btn" id="resetTimerBtn">Сброс</button>
+          <button class="primary-btn timer-btn main-action" id="toggleTimerBtn">Старт</button>
+        </div>
+
+        <!-- Аудио-панель -->
+        <div class="audio-deck">
+          <div class="deck-title">
+            <span>🎵 Звуковое пространство</span>
+            <span class="current-track-name" id="currentTrackName">Альфа-волны (Фокус)</span>
+          </div>
+
+          <div class="audio-selectors">
+            <button class="sound-chip active" data-sound="alpha">Альфа 10 Гц</button>
+            <button class="sound-chip" data-sound="theta">Тета 6 Гц</button>
+            <button class="sound-chip" data-sound="rain">Шум дождя</button>
+            <button class="sound-chip" data-sound="silence">Тишина</button>
+          </div>
+
+          <!-- Пользовательская музыка -->
+          <div class="custom-music-uploader">
+            <label for="musicFileInput" class="custom-file-btn" id="uploadMusicBtnLabel">
+              <span>➕ Загрузить аудиофайл (MP3, M4A, WAV)</span>
+            </label>
+            <input type="file" id="musicFileInput" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" style="display: none;">
+            
+            <div id="customTrackIndicator" class="custom-track-card hidden">
+              <!-- Верхняя строка: название и крестик в правом углу -->
+              <div class="custom-track-top-bar">
+                <div class="custom-track-title-wrap">
+                  <span class="custom-note-icon">🎵</span>
+                  <span id="customFileName" class="custom-file-name">Трек загружен</span>
+                </div>
+                <button id="removeCustomTrackBtn" class="remove-track-btn" title="Удалить трек">✕</button>
+              </div>
+
+              <!-- Средняя строка: прогресс-бар и время -->
+              <div class="custom-track-progress-row">
+                <input type="range" id="customTrackSeek" min="0" max="100" value="0" step="0.5">
+                <div class="track-time-labels">
+                  <span id="customCurrentTime">00:00</span>
+                  <span id="customDuration">00:00</span>
+                </div>
+              </div>
+
+              <!-- Нижняя строка: крупная центральная кнопка управления -->
+              <div class="custom-track-actions">
+                <button class="track-play-btn large-play-btn" id="toggleCustomPlayBtn" type="button">
+                  <span id="playIcon">▶</span> <span id="playText">Слушать трек</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="volume-slider-wrap">
+            <span>🔈</span>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7">
+            <span>🔊</span>
+          </div>
+        </div>
+
+        <!-- Краткое правило текущей недели -->
+        <div class="instruction-box">
+          <h4>Правило Хаанела для этого урока:</h4>
+          <p id="practiceInstructionText">Запрещено любое произвольное движение: чесаться, поправлять одежду, ерзать. Наблюдайте импульсы, не реагируя на них.</p>
+        </div>
+      </section>
+
+      <!-- 3. Экран Ментального чертежа (Цели) -->
+      <section id="tab-blueprint" class="tab-pane">
+        <div class="screen-header">
+          <h2>Ментальный чертёж</h2>
+          <p class="screen-desc">«Архитектор не кладет ни одного кирпича, пока нет точного чертежа». Постройте вашу матрицу по законам Хаанела.</p>
+        </div>
+
+        <div class="blueprint-card">
+          <div class="form-group">
+            <label>1. Конечный результат (Только в настоящем времени)</label>
+            <textarea id="blueprintGoal" rows="3" placeholder="Пример: Я руковожу успешной IT-компанией. Мой доход составляет... (Избегайте: 'хочу', 'буду', 'избавлюсь от долгов')"></textarea>
+            <small class="hint">Хаанел: Подсознание не знает будущего времени. Только переживание свершившегося факта.</small>
+          </div>
+
+          <div class="form-group">
+            <label>2. Сенсорные детали и физические ощущения</label>
+            <textarea id="blueprintSensory" rows="3" placeholder="Что вы слышите, видите, чувствуете тактильно? Звук подписываемого договора, вес ключей в руке, уверенность в осанке..."></textarea>
+            <small class="hint">Хаанел: Чувства и кинестетика заряжают мысленный образ электричеством.</small>
+          </div>
+
+          <div class="form-group">
+            <label>3. Кто вас окружает и какая сцена подтверждает успех?</label>
+            <textarea id="blueprintScene" rows="3" placeholder="Опишите короткую 10-секундную сцену, которая однозначно доказывает, что цель достигнута."></textarea>
+            <small class="hint">Эту сцену вы будете оживлять на Неделях 5–12 и далее.</small>
+          </div>
+
+          <div class="blueprint-actions">
+            <button class="primary-btn" id="saveBlueprintBtn">Зафиксировать чертёж</button>
+            <button class="secondary-btn" id="aiAssistBtn">✨ Проверить по правилам Хаанела</button>
+          </div>
+
+          <div id="blueprintReviewOutput" class="review-box hidden">
+            <h4>Анализ чертежа:</h4>
+            <div id="blueprintReviewContent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Экран Дневника и Рефлексии -->
+      <section id="tab-journal" class="tab-pane">
+        <div class="screen-header">
+          <h2>Дневник Наблюдений</h2>
+          <p class="screen-desc">Фиксация динамики ума и тела после каждой сессии.</p>
+        </div>
+
+        <div class="journal-new-entry">
+          <h3>Запись сегодняшней практики</h3>
+          <div class="rating-group">
+            <label>Степень неподвижности / фокуса (1-10):</label>
+            <input type="range" id="sessionScore" min="1" max="10" value="8" oninput="document.getElementById('scoreVal').innerText = this.value">
+            <span id="scoreVal" class="score-badge">8</span>
+          </div>
+
+          <div class="form-group">
+            <label>Что происходило в теле и мыслях?</label>
+            <textarea id="journalNotes" rows="3" placeholder="Были ли позывы пошевелиться? Какие посторонние мысли пытались вторгнуться? Удалось ли вернуть тишину?"></textarea>
+          </div>
+
+          <button class="primary-btn" id="saveJournalBtn">Сохранить запись</button>
+        </div>
+
+        <div class="journal-history" id="journalHistoryList">
+          <!-- История записей -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Нижняя мобильная навигация -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="tab-path">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-label">Ступени</span>
+      </button>
+      <button class="nav-item" data-tab="tab-practice">
+        <span class="nav-icon">🧘‍♂️</span>
+        <span class="nav-label">Практика</span>
+      </button>
+      <button class="nav-item" data-tab="tab-blueprint">
+        <span class="nav-icon">📐</span>
+        <span class="nav-label">Чертёж</span>
+      </button>
+      <button class="nav-item" data-tab="tab-journal">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">Дневник</span>
+      </button>
+    </nav>
+
+    <!-- Модальное окно подтверждения завершения урока -->
+    <div class="modal-overlay hidden" id="finishModal">
+      <div class="modal-card">
+        <h3>Сессия завершена! 🌟</h3>
+        <p>15 минут практики зачтены в текущую неделю.</p>
+        <div class="modal-question">
+          <p><strong>Контрольный вопрос Хаанела:</strong></p>
+          <p id="modalQuestionText">Удалось ли вам сохранить полную физическую неподвижность на протяжении всей сессии?</p>
+          <div class="modal-buttons">
+            <button class="modal-btn yes" id="modalConfirmYes">Да, успешно</button>
+            <button class="modal-btn no" id="modalConfirmNo">Были трудности (повторю)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="userAudioElement" loop preload="auto"></audio>
+  <audio id="ambientPlayer" loop></audio>
+  <audio id="bellAudio"></audio>
+
+  <script src="data.js?v=2"></script>
+  <script src="audio.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
